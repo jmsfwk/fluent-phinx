@@ -2,6 +2,7 @@
 
 namespace jmsfwk\FluentPhinx\Schema;
 
+use Closure;
 use Phinx\Db\Adapter\AdapterInterface;
 use Phinx\Db\Adapter\MysqlAdapter;
 use Phinx\Db\Table;
@@ -20,10 +21,17 @@ class Blueprint
 {
     /** @var Table */
     private $table;
+    /** @var Closure[] */
+    private static $macros = [];
 
     public function __construct(Table $table)
     {
         $this->table = $table;
+    }
+
+    public static function macro(string $name, Closure $macro): void
+    {
+        self::$macros[$name] = $macro;
     }
 
     /* Columns */
@@ -280,6 +288,16 @@ class Blueprint
         $this->table->addColumn($column);
 
         return new Column($column);
+    }
+
+    public function __call(string $method, $args)
+    {
+        $macro = self::$macros[$method] ?? null;
+        if (!$macro) {
+            return $this;
+        }
+
+        return $macro->call($this, ...$args) ?? $this;
     }
 
     public function __get($name)

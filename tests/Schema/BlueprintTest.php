@@ -32,6 +32,35 @@ class BlueprintTest extends TestCase
     }
 
     /** @test */
+    public function macros_can_call_methods_on_the_blueprint()
+    {
+        Blueprint::macro('timestamp', function (string $name) {
+            /** @var Blueprint $this */
+            return $this->addColumn($name, '::type::');
+        });
+        $blueprint = new Blueprint($this->mockTable);
+
+        self::expectColumn($this->mockTable, '::column::', '::type::');
+
+        $blueprint->timestamp('::column::');
+    }
+
+    /** @test */
+    public function macros_can_set_properties_on_the_blueprint()
+    {
+        Blueprint::macro('id', function () {
+            /** @var Blueprint $this */
+            $this->id = false;
+        });
+        $table = new Table('::name::');
+        $blueprint = new Blueprint($table);
+
+        $blueprint->id();
+
+        self::assertEquals(['id' => false], $table->getOptions());
+    }
+
+    /** @test */
     public function binary()
     {
         $blueprint = new Blueprint($this->mockTable);
