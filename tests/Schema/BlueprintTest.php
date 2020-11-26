@@ -222,15 +222,15 @@ class BlueprintTest extends TestCase
     }
 
     /** @test */
-    public function mediumInteger()
+    public function tinyInteger()
     {
         $blueprint = new Blueprint($this->mockTable);
 
         self::expectColumn($this->mockTable, '::column::', 'integer', [
-            'limit' => MysqlAdapter::INT_MEDIUM,
+            'limit' => MysqlAdapter::INT_TINY,
         ]);
 
-        $blueprint->mediumInteger('::column::');
+        $blueprint->tinyInteger('::column::');
     }
 
     /** @test */
@@ -243,6 +243,18 @@ class BlueprintTest extends TestCase
         ]);
 
         $blueprint->smallInteger('::column::');
+    }
+
+    /** @test */
+    public function mediumInteger()
+    {
+        $blueprint = new Blueprint($this->mockTable);
+
+        self::expectColumn($this->mockTable, '::column::', 'integer', [
+            'limit' => MysqlAdapter::INT_MEDIUM,
+        ]);
+
+        $blueprint->mediumInteger('::column::');
     }
 
     /** @test */

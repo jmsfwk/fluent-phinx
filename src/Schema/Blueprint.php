@@ -183,6 +183,11 @@ class Blueprint
         return $this->addColumn($name, AdapterInterface::PHINX_TYPE_TIME);
     }
 
+    public function tinyInteger(string $name): Column
+    {
+        return $this->addInteger($name, MysqlAdapter::INT_TINY);
+    }
+
     /* Indexes */
 
     /**
