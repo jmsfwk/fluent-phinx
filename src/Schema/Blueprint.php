@@ -188,6 +188,37 @@ class Blueprint
         return $this->addInteger($name, MysqlAdapter::INT_TINY);
     }
 
+
+    public function unsignedBigInteger(string $name): Column
+    {
+        return $this->bigInteger($name)->unsigned();
+    }
+
+    public function unsignedDecimal(string $name, int $total = 8, int $places = 2): Column
+    {
+        return $this->decimal($name, $total, $places = 2)->unsigned();
+    }
+
+    public function unsignedInteger(string $name): Column
+    {
+        return $this->integer($name)->unsigned();
+    }
+
+    public function unsignedMediumInteger(string $name): Column
+    {
+        return $this->mediumInteger($name)->unsigned();
+    }
+
+    public function unsignedSmallInteger(string $name): Column
+    {
+        return $this->smallInteger($name)->unsigned();
+    }
+
+    public function unsignedTinyInteger(string $name): Column
+    {
+        return $this->tinyInteger($name)->unsigned();
+    }
+
     /* Indexes */
 
     /**
