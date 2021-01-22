@@ -436,10 +436,131 @@ class BlueprintTest extends TestCase
         $blueprint->longText('::column::');
     }
 
+    /* Indexes */
+
+    /** @test */
+    public function index()
+    {
+        $blueprint = new Blueprint($this->mockTable);
+
+        self::expectIndex($this->mockTable, '::column::', [
+            'name' => null,
+        ]);
+
+        $blueprint->index('::column::');
+    }
+
+    /** @test */
+    public function index_with_name()
+    {
+        $blueprint = new Blueprint($this->mockTable);
+
+        self::expectIndex($this->mockTable, '::column::', [
+            'name' => '::name::',
+        ]);
+
+        $blueprint->index('::column::', '::name::');
+    }
+
+    /** @test */
+    public function index_with_multiple_columns()
+    {
+        $blueprint = new Blueprint($this->mockTable);
+
+        self::expectIndex($this->mockTable, ['::column1::', '::column2::'], [
+            'name' => null,
+        ]);
+
+        $blueprint->index(['::column1::', '::column2::']);
+    }
+
+    /** @test */
+    public function unique()
+    {
+        $blueprint = new Blueprint($this->mockTable);
+
+        self::expectIndex($this->mockTable, '::column::', [
+            'name' => null,
+            'unique' => true,
+        ]);
+
+        $blueprint->unique('::column::');
+    }
+
+    /** @test */
+    public function unique_with_name()
+    {
+        $blueprint = new Blueprint($this->mockTable);
+
+        self::expectIndex($this->mockTable, '::column::', [
+            'name' => '::name::',
+            'unique' => true,
+        ]);
+
+        $blueprint->unique('::column::', '::name::');
+    }
+
+    /** @test */
+    public function unique_with_multiple_columns()
+    {
+        $blueprint = new Blueprint($this->mockTable);
+
+        self::expectIndex($this->mockTable, ['::column1::', '::column2::'], [
+            'name' => null,
+            'unique' => true,
+        ]);
+
+        $blueprint->unique(['::column1::', '::column2::']);
+    }
+
+    /** @test */
+    public function foreign()
+    {
+        $blueprint = new Blueprint($this->mockTable);
+
+        self::expectForeignKey($this->mockTable, '::column::', '::on::', '::references::');
+
+        $blueprint->foreign('::column::')->references('::references::')->on('::on::');
+    }
+
+    /** @test */
+    public function foreign_with_on_update_and_on_delete()
+    {
+        $blueprint = new Blueprint($this->mockTable);
+
+        self::expectForeignKey($this->mockTable, '::column::', '::on::', '::references::', [
+            'update' => 'cascade',
+            'delete' => 'restrict',
+        ]);
+
+        $blueprint->foreign('::column::')
+            ->references('::references::')
+            ->on('::on::')
+            ->onUpdate('cascade')
+            ->onDelete('restrict');
+    }
+
     private static function expectColumn($table, string $name, string $type, array $options = []): void
     {
         $column = (new Table\Column())->setName($name)->setType($type)->setOptions($options);
 
         $table->expects(self::once())->method('addColumn')->with($column);
+    }
+
+    private static function expectIndex(MockObject $table, $columns, array $options = []): void
+    {
+        $table->expects(self::once())->method('addIndex')->with($columns, $options);
+    }
+
+    private static function expectForeignKey(
+        MockObject $table,
+        $columns,
+        string $referencedTable,
+        string $referencedColumn,
+        array $options = []
+    ): void {
+        $table->expects(self::once())
+            ->method('addForeignKey')
+            ->with($columns, $referencedTable, $referencedColumn, $options);
     }
 }
