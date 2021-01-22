@@ -287,7 +287,7 @@ class Blueprint
             ->setOptions($options);
         $this->table->addColumn($column);
 
-        return new Column($column);
+        return new Column($column, $this);
     }
 
     public function __call(string $method, $args)

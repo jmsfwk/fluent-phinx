@@ -8,10 +8,13 @@ class Column
 {
     /** @var PhinxColumn */
     private $column;
+    /** @var Blueprint */
+    private $blueprint;
 
-    public function __construct(PhinxColumn $column)
+    public function __construct(PhinxColumn $column, Blueprint $blueprint)
     {
         $this->column = $column;
+        $this->blueprint = $blueprint;
     }
 
     public function after(string $name): self
@@ -49,9 +52,9 @@ class Column
         return $this;
     }
 
-    public function default($comment): self
+    public function default($value): self
     {
-        $this->column->setDefault($comment);
+        $this->column->setDefault($value);
 
         return $this;
     }
@@ -80,6 +83,27 @@ class Column
     public function useCurrent(): self
     {
         $this->column->setDefault('CURRENT_TIMESTAMP');
+
+        return $this;
+    }
+
+    public function index(string $name = null): self
+    {
+        $this->blueprint->index($this->column->getName(), $name);
+
+        return $this;
+    }
+
+    public function primary(): self
+    {
+        $this->blueprint->primary_key = $this->column->getName();
+
+        return $this;
+    }
+
+    public function unique(string $name = null): self
+    {
+        $this->blueprint->unique($this->column->getName(), $name);
 
         return $this;
     }
