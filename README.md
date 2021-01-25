@@ -6,6 +6,7 @@ Laravel-style migrations for [Phinx][phinx].
 - [Migration Structure](#migration-structure)
 - [Tables](#tables)
     - [Creating Tables](#creating-tables)
+    - [Updating Tables](#updating-tables)
     - [Table Options](#table-options)
 
 <a name="introduction"></a>
@@ -55,13 +56,29 @@ class CreateUsersTable extends AbstractMigration
 <a name="creating-tables"></a>
 ### Creating Tables
 
-To create a new database table, use the `create` method on from the `Fluent` trait. The create method accepts two arguments: the first is the name of the table, while the second is a Closure which receives a Blueprint object that may be used to define the new table:
+To create a new database table, use the `create` method on from the `Fluent` trait. The create method accepts two
+arguments: the first is the name of the table, while the second is a closure which receives a `Blueprint` object
+that may be used to define the new table:
 
-    $this->create('users', function (Blueprint $table) {
-        $table->increments('id');
-    });
+```php
+$this->create('users', function (Blueprint $table) {
+    $table->increments('id');
+});
+```
 
 When creating the table, you may use any of the schema builder's column methods to define the table's columns.
+
+<a name="updating-tables"></a>
+### Updating Tables
+
+To update a table the `update` method from the `Fluent` trait can be used. Like the `create` method this will accept
+two arguments: the name of the table, and a closure that receives a `Blueprint` object to define the changes.
+
+```php
+$this->update('users', function (Blueprint $table) {
+    $table->integer('votes');
+});
+```
 
 <a name="table-options"></a>
 ### Table Options
