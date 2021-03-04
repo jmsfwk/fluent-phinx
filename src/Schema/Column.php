@@ -3,6 +3,7 @@
 namespace jmsfwk\FluentPhinx\Schema;
 
 use Phinx\Db\Table\Column as PhinxColumn;
+use Phinx\Util\Literal;
 
 class Column
 {
@@ -87,6 +88,20 @@ class Column
         return $this;
     }
 
+    public function virtualAs(string $expression): self
+    {
+        $this->column->setType(Literal::from("{$this->getColumnSqlDefinition()} AS ({$expression})"));
+
+        return $this;
+    }
+
+    public function storedAs(string $expression): self
+    {
+        $this->column->setType(Literal::from("{$this->getColumnSqlDefinition()} AS ({$expression}) STORED"));
+
+        return $this;
+    }
+
     public function index(string $name = null): self
     {
         $this->blueprint->index($this->column->getName(), $name);
@@ -106,5 +121,22 @@ class Column
         $this->blueprint->unique($this->column->getName(), $name);
 
         return $this;
+    }
+
+    private function getColumnSqlDefinition(): string
+    {
+        $adapter = $this->blueprint->getTable()->getAdapter();
+        $column = $this->column;
+
+        $sqlType = $adapter->getSqlType($column->getType(), $column->getLimit());
+        $def = strtoupper($sqlType['name']);
+
+        if ($column->getPrecision() && $column->getScale()) {
+            $def .= "({$column->getPrecision()}, {$column->getScale()})";
+        } elseif (isset($sqlType['limit'])) {
+            $def .= "({$sqlType['limit']})";
+        }
+
+        return $def;
     }
 }

@@ -4,6 +4,7 @@ namespace Tests\FluentPhinx\Schema;
 
 use jmsfwk\FluentPhinx\Schema\Blueprint;
 use jmsfwk\FluentPhinx\Schema\Column as FluentColumn;
+use Phinx\Db\Adapter\AdapterInterface;
 use Phinx\Db\Table;
 use Phinx\Db\Table\Column;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -108,6 +109,34 @@ class ColumnTest extends TestCase
         $this->column->useCurrent();
 
         self::assertEquals('CURRENT_TIMESTAMP', $this->phinx->getDefault());
+    }
+
+    /** @test */
+    public function virtualAs()
+    {
+        $table = new Table('::table::', [], $adapter = $this->createMock(AdapterInterface::class));
+        $phinx = new Column();
+        $column = new FluentColumn($phinx, new Blueprint($table));
+        $adapter->method('getSqlType')->willReturn(['name' => 'string']);
+
+        $column->virtualAs('::expression::');
+
+        self::assertMatchesRegularExpression('/^string/i', (string)$phinx->getType());
+        self::assertMatchesRegularExpression('/AS \(::expression::\)$/', (string)$phinx->getType());
+    }
+
+    /** @test */
+    public function storedAs()
+    {
+        $table = new Table('::table::', [], $adapter = $this->createMock(AdapterInterface::class));
+        $phinx = new Column();
+        $column = new FluentColumn($phinx, new Blueprint($table));
+        $adapter->method('getSqlType')->willReturn(['name' => 'char', 'limit' => 50]);
+
+        $column->storedAs('::expression::');
+
+        self::assertMatchesRegularExpression('/^char ?\(50\)/i', (string)$phinx->getType());
+        self::assertMatchesRegularExpression('/AS \(::expression::\) STORED/', (string)$phinx->getType());
     }
 
     /** @test */

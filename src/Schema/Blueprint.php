@@ -290,6 +290,12 @@ class Blueprint
         return new Column($column, $this);
     }
 
+    /** @internal */
+    public function getTable(): Table
+    {
+        return $this->table;
+    }
+
     public function __call(string $method, $args)
     {
         $macro = self::$macros[$method] ?? null;
